@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: scaffold-demo-starter
+  profiles:
+    active: ${DEPLOY_ENV:test}
+  cloud:
+    config:
+      uri: http://localhost:8080
+      profile: ${DEPLOY_ENV:test}
+      label: ${DEPLOY_ENV:test}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: true
+      connection-test-query: SELECT 1
+      pool-name: DatebookHikariCP
+      connection-timeout: 30000
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      maximum-pool-size: 80
+      minimum-idle: 5
+mybatis-plus:
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: isDeleted  # 全局逻辑删除的实体字段名，isDelete不需要再加@TableLogic的注解
+      logic-delete-value: Y # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: N # 逻辑未删除值(默认为 0)
+      select-strategy: not_empty
+      update-strategy: not_empty
+  type-aliases-package: cn.bishion.scaffold.demo.service.demo1.db

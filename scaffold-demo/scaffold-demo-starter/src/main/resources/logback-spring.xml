@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
+    <property name="LOG_HOME" value="${LOG_PATH:-/alidata1/admin/}${APP_NAME}/logs"/>
+
+    <!-- 日志格式 用于输出控制台 -->
+    <property name="STDOUT"
+              value="${CONSOLE_LOG_PATTERN:-%d [%thread] %-5p [%c] [%F:%L] [trace=%X{X-B3-TraceId:-},span=%X{X-B3-SpanId:-},parent=%X{X-B3-ParentSpanId:-}] - %msg%n}"/>
+
+    <!--  控制台输出-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${STDOUT}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- info级别 -->
+    <appender name="INFO_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${HOSTNAME}_app_${APP_NAME}_lt_info.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${HOSTNAME}_app_${APP_NAME}_lt_info_%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <pattern>${STDOUT}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 大于WARN级别 -->
+    <appender name="ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${HOSTNAME}_app_${APP_NAME}_lt_error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${HOSTNAME}_app_${APP_NAME}_lt_error_%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <pattern>${STDOUT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="bizAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${HOSTNAME}-ss_micro_app_${APP_NAME}_lt_biz.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_HOME}/${HOSTNAME}-ss_micro_app_${APP_NAME}_lt_biz-%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8" class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="BIZ_LOGGER" additivity="false" level="info">
+        <appender-ref ref="bizAppender"/>
+    </logger>
+    <springProfile name="prd,pre">
+        <root level="INFO">
+            <appender-ref ref="INFO_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <springProfile name="dev,test">
+        <logger name="cn.bishion" level="DEBUG"/>
+        <root level="INFO">
+            <appender-ref ref="INFO_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <logger level="ERROR" name="io.swagger.models.parameters.AbstractSerializableParameter"/>
+</configuration>
