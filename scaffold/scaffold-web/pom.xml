@@ -11,5 +11,22 @@
 
     <artifactId>scaffold-web</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-json</artifactId>
+            <version>5.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.bishion</groupId>
+            <artifactId>scaffold-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
 
 </project>
