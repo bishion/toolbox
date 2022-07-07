@@ -5,6 +5,8 @@ import cn.bishion.scaffold.service.PathParseService;
 import cn.bishion.scaffold.service.dto.GenerateRequest;
 import cn.bishion.toolkit.common.consts.BaseConst;
 import cn.bishion.toolkit.common.dto.BaseResult;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -36,6 +39,7 @@ public class GenerateController {
     private static final String FIELD_APP_CODE = "appCode";
     private static final String FIELD_GROUP_ID = "groupId";
     private static final String FIELD_SUFFIX = "appSuffix";
+    private static final String FIELD_DATE = "initDate";
 
     @SneakyThrows
     @PostMapping("/generate")
@@ -71,6 +75,8 @@ public class GenerateController {
         if (CharSequenceUtil.isBlank(request.getAppCode())) {
             param.put(FIELD_APP_CODE, "demo");
         }
+        param.put(FIELD_DATE, DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN));
+
         String appCode = param.get(FIELD_APP_CODE).toString();
         param.put(FIELD_SUFFIX, StrUtil.contains(appCode, BaseConst.HYPHEN) ?
                 appCode.split(BaseConst.HYPHEN)[BaseConst.INT_1] : appCode);
