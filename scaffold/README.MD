@@ -1,60 +1,23 @@
 # 脚手架生成器
 
+## 背景
+
+1. 每次创建新应用时，都要从头开始搭建代码框架，费时费力
+2. 新同学入职后需要一个干净的基础框架，以便快速熟悉开发环境
+3. 包、组件的常见命名规范因为沟通问题，造成每个人搭建的应用都有浓厚的个人色彩
+4. 放在wiki里的 demo 代码，如下问题：
+   1. 更新不及时，更新后不好通知所有人
+   2. 或者许多人干脆本地存一份，导致用的一直最老的版本
+   3. 下载后，每次要手动改包名
+   4. 依赖了所有组件，自己用不到的需要手动删
+
+综上，我们需要一个代码脚手架，用户在使用的时候指定参数，系统根据参数自动生成符合要求的最新版代码结构
+
 ## 基本功能
 
-### 自动生成脚手架代码
-
-代码结构如下
-
-```text
-appName
-  - appName-service
-    - service-common
-      - src/main/java
-    - service-demo1
-      - src/main/java
-        - package.name
-          - repository
-            - entity
-            - mapper
-            - vo
-            - manager
-          - north
-            - local
-            - facade
-          - south
-            - adapter
-            - port
-          - service
-            - dto
-            DemoService.java
-  - appName-starter
-    - src
-      - main
-        - java
-          - packageName
-              AppNameApplication.java
-        - resources
-            application.yml
-            bootstrap.yml
-            logback-spring.xml
-      - test  
-        - java
-          - packageName
-              BaseAppNameTest.java
-        - resources
-  - appName-web
-    - src
-      - main
-        - java
-          - packageName
-            - facade
-            - controller
-  - changelog
-  pom.xml
-  README.MD
-  .gitignore
-```
+1. 代码结构自动生成
+2. 包名，关键类名可以指定
+3. 组件可选，比如是否需要Redis，Kafka
 
 ## 技术
 
