@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * 这里存放当前服务的数据传输对象
  *
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022-05-27 23:19:20
  * @version: 1.0.0
  */

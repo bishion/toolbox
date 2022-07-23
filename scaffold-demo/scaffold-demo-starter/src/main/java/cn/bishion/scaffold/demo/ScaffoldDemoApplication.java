@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 /**
  * 脚手架演示应用程序
  *
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022-05-27 09:06:40
  * @version: 1.0.0
  */

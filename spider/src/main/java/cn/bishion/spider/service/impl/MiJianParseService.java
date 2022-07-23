@@ -1,7 +1,9 @@
 package cn.bishion.spider.service.impl;
 
 import cn.bishion.spider.consts.BaseConst;
+import cn.bishion.spider.dto.MiJianResultDTO;
 import cn.bishion.spider.service.AbstractHtmlParseService;
+import cn.bishion.spider.service.MiJianSaveService;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,6 +12,7 @@ import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,15 +20,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022/6/27-20:31
  * @version: 1.0.0
  */
 @Service("miJianParseService")
 public class MiJianParseService extends AbstractHtmlParseService {
 
-    private static final String MI_JIAN_PATH = "/spider/miJian/";
-    private static final String MI_JIAN_DOMAIN = "http://www.***.com";
+    @Resource
+    private MiJianSaveService miJianSaveService;
+    private static final String MI_JIAN_PATH = "/alidata1/admin/spider/miJian/";
+    private static final String MI_JIAN_DOMAIN = "http://www.**********.com";
 
     private Set<String> parseNextUrl(TagNode tagNode,String expression) {
 
@@ -48,7 +53,10 @@ public class MiJianParseService extends AbstractHtmlParseService {
         if (StrUtil.isBlank(title)){
             return Collections.emptySet();
         }
-        String fileName = MI_JIAN_PATH + StrUtil.subAfter(url, "www.***.com/", true)
+
+        MiJianResultDTO miJianResultDTO = new MiJianResultDTO();
+
+        String fileName = MI_JIAN_PATH + StrUtil.subAfter(url, "www.**********.com/", true)
                 .replaceAll(BaseConst.SLASH,"-")+".txt";
 
         FileUtil.writeString(title + FileUtil.getLineSeparator(),
@@ -64,7 +72,7 @@ public class MiJianParseService extends AbstractHtmlParseService {
         FileUtil.appendString(articleTime + FileUtil.getLineSeparator(),
                 fileName, Charset.defaultCharset());
 
-        String article = getInnerHtml(cleaner, parseByXPath(tagNode, "//div[@class='dlm-main']"));
+        String article = getText(parseByXPath(tagNode, "//div[@class='dlm-main']"));
         FileUtil.appendString(article + FileUtil.getLineSeparator(),
                 fileName, Charset.defaultCharset());
 
@@ -72,6 +80,13 @@ public class MiJianParseService extends AbstractHtmlParseService {
         FileUtil.appendString(commentList + FileUtil.getLineSeparator(),
                 fileName, Charset.defaultCharset());
 
+        miJianResultDTO.setTitle(title);
+        miJianResultDTO.setAuthor(author);
+        miJianResultDTO.setUrl(url);
+        miJianResultDTO.setWriteDate(articleTime);
+        miJianResultDTO.setContent(article);
+        miJianResultDTO.setComment(commentList);
+        miJianSaveService.saveContent(miJianResultDTO);
         return parseNextUrl(tagNode,"//div[@class='talk-main']/div[1]/a");
     }
 
@@ -116,8 +131,8 @@ public class MiJianParseService extends AbstractHtmlParseService {
 
     public static void main(String[] args) {
         MiJianParseService service = new MiJianParseService();
-        Set<String> urlSet = service.reqAndParseByUrl("http://www.***.com/group/fa/269119.html");
+        Set<String> urlSet = service.reqAndParseByUrl("http://www.**********.com//group/fa/269119.html");
         System.out.println(urlSet);
-        System.out.println(StrUtil.subAfter("http://www.***.com/group/yxa/370685.html","www.***.com/",true).replaceAll(BaseConst.SLASH,"-"));
+        System.out.println(StrUtil.subAfter("http://www.**********.com//group/yxa/370685.html","www.**********.com//",true).replaceAll(BaseConst.SLASH,"-"));
     }
 }

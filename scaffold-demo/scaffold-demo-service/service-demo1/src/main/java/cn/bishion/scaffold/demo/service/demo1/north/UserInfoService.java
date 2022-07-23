@@ -5,7 +5,7 @@ import cn.bishion.scaffold.demo.service.demo1.dto.UserInfoDTO;
 /**
  * 用户信息服务
  *
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022-05-27 23:24:08
  * @version: 1.0.0
  */

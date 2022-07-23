@@ -3,7 +3,7 @@ package cn.bishion.scaffold.demo.service.demo1.db.entity;
 /**
  * 用户信息
  *
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022-05-27 23:29:11
  * @version: 1.0.0
  */

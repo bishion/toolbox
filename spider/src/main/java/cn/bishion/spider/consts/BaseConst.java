@@ -1,7 +1,7 @@
 package cn.bishion.spider.consts;
 
 /**
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022/6/28-13:59
  * @version: 1.0.0
  */

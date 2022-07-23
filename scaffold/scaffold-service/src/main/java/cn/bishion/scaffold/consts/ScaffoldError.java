@@ -3,7 +3,7 @@ package cn.bishion.scaffold.consts;
 import cn.bishion.toolkit.common.consts.BaseError;
 
 /**
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022/6/20-9:19
  * @version: 1.0.0
  */

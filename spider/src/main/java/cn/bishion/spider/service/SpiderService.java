@@ -12,20 +12,20 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * @author: guofangbi
+ * @author: Bishion
  * @date: 2022/6/27-20:18
  * @version: 1.0.0
  */@Service
 @Slf4j
 public class SpiderService {
     public Set<String> urlSet = new HashSet<>();
-    private static final String URL_PAH = "/spider/miJianUrl.txt";
+    private static final String URL_PAH = "/alidata1/admin/spider/miJianUrl.txt";
     @Resource
     private Map<String, HtmlParseService> htmlParseServiceMap;
 
-    private static final List<String> MI_JIAN_BASE_URL = Arrays.asList("http://www.***.com/group/fa/",
-            "http://www.***.com/group/yxa/",
-            "http://www.***.com/help/");
+    private static final List<String> MI_JIAN_BASE_URL = Arrays.asList("http://www.**********.com/group/fa/"
+/*            "http://www.**********.com/group/yxa/",
+            "http://www.**********.com/help/"*/);
     public void spiderByEnterUrl(SiteType siteType){
         if (!FileUtil.exist(URL_PAH)){
             FileUtil.newFile(URL_PAH);
@@ -67,7 +67,7 @@ public class SpiderService {
     private void saveUrlAndSleep(String url){
         urlSet.add(url);
         FileUtil.appendString(url + FileUtil.getLineSeparator(), URL_PAH, Charset.defaultCharset());
-        ThreadUtil.sleep(RandomUtil.randomLong(10000));
+        ThreadUtil.sleep(RandomUtil.randomLong(100));
     }
 
 }
