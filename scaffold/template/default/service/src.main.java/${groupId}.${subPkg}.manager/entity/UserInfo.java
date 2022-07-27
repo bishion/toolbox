@@ -1,4 +1,4 @@
-package package ${groupId}.${appSuffix}.manager.entity;
+package package ${groupId}.${subPkg}.manager.entity;
 
 /**
  * 用户信息

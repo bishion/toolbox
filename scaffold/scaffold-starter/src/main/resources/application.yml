@@ -1,0 +1,5 @@
+scaffold:
+  tmpFolder: /alidata1/admin/scaffold/
+  templateFolder: /alidata1/admin/template/
+  defaultGroup: cn.bishion
+  defaultApp: demo

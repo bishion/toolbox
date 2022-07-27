@@ -22,6 +22,7 @@
         <finalName>starter</finalName>
         <plugins>
             <plugin>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>cn.bishion.scaffold.ScaffoldApplication</mainClass>
@@ -33,8 +34,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <groupId>org.springframework.boot</groupId>
-                <version>2.4.3</version>
             </plugin>
         </plugins>
     </build>

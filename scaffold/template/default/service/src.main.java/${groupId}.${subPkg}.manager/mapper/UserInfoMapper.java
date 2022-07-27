@@ -1,6 +1,6 @@
-package ${groupId}.${appSuffix}.manager.mapper;
+package ${groupId}.${subPkg}.manager.mapper;
 
-import ${groupId}.${appSuffix}.manager.entity.UserInfo;
+import ${groupId}.${subPkg}.manager.entity.UserInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

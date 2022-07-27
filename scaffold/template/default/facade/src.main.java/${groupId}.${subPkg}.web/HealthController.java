@@ -1,4 +1,4 @@
-package ${groupId}.${appSuffix}.web;
+package ${groupId}.${subPkg}.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version: 1.0.0
  */
 @RestController
-public class DemoController {
+public class HealthController {
     @GetMapping("/health")
     public String health() {
         return "SUCCESS";

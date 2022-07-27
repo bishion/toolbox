@@ -28,4 +28,4 @@ mybatis-plus:
       logic-not-delete-value: N # 逻辑未删除值(默认为 0)
       select-strategy: not_empty
       update-strategy: not_empty
-  type-aliases-package: cn.bishion.scaffold.demo.service.demo1.db
+  type-aliases-package: ${groupId}.${subPkg}.manager

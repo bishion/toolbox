@@ -1,0 +1,4 @@
+swagger:
+  basePackage: cn.bishion.scaffold
+  title: 代码脚手架
+  description: 代码脚手架生成

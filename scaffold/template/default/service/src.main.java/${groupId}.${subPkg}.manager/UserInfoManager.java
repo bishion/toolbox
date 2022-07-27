@@ -1,4 +1,4 @@
-package ${groupId}.${appSuffix}.manager;
+package ${groupId}.${subPkg}.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
