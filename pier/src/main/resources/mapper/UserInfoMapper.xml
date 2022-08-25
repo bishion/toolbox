@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bishion.pier.mapper.UserInfoMapper">
+
+    <resultMap id="BaseResultMap" type="cn.bishion.pier.entity.UserInfo">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="loginName" column="login_Name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="string">
+        select * from user_info
+        <where>
+            <if test="username !=null">
+                username=#{username}
+            </if>
+        </where>
+
+    </select>
+    <select id="selectMap" resultType="java.util.LinkedHashMap" parameterType="string">
+        select username,id from user_info
+        <where>
+            <if test="username !=null">
+                username=#{username}
+            </if>
+        </where>
+
+    </select>
+</mapper>
