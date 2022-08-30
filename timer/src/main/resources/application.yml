@@ -18,15 +18,8 @@ spring:
     properties:
       org:
         quartz:
-          dataSource:
-            qzDS:
-              provider: hikaricp
-              driver: com.mysql.cj.jdbc.Driver
-              URL: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false&autoReconnect=true&serverTimezone=UTC
           jobStore:
             isClustered: true
-            dataSource: qzDS
-            tablePrefix: QRTZ_
     wait-for-jobs-to-complete-on-shutdown: true
     overwrite-existing-jobs: false
 
