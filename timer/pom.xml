@@ -84,6 +84,16 @@
             <artifactId>lombok</artifactId>
             <version>1.18.18</version>
         </dependency>
+        <dependency>
+            <groupId>cn.bishion</groupId>
+            <artifactId>mybatis-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.bishion</groupId>
+            <artifactId>swagger-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

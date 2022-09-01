@@ -4,15 +4,20 @@ import cn.bishion.toolkit.common.util.ToString;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 @Getter
 @Setter
-public class CreateJobReq {
-    private String jobName;
+public class QuartzJobDTO {
     private String cron;
-    private String param;
+    private String jobName;
+    private String group;
+    private String triggerName;
+    private Map<String,String> param;
 
     @Override
     public String toString() {
         return ToString.toString(this);
     }
+
 }

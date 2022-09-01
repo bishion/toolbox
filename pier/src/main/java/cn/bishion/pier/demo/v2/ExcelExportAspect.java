@@ -50,7 +50,7 @@ public class ExcelExportAspect {
         ExcelWriter excelWriter = EasyExcel.write(out, export.targetType()).build();
         // 这里注意 如果同一个sheet只要创建一次
         WriteSheet writeSheet = EasyExcel.writerSheet("sheet").build();
-        Long count = pageResult.getTotal();
+        Integer count = pageResult.getTotal();
         if ( count> 0){
             long pages = count/export.pageSize()+1;
             exportBaseCond.setPageSize(export.pageSize());

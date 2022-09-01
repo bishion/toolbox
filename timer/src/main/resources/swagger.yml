@@ -1,0 +1,4 @@
+swagger:
+  basePackage: cn.bishion.timer.web
+  title: 定时任务
+  description: 定时任务应用

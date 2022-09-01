@@ -1,46 +1,74 @@
 package cn.bishion.timer.service;
 
-import cn.bishion.timer.dto.CreateJobReq;
+import cn.bishion.timer.consts.TimerError;
+import cn.bishion.timer.dto.QuartzJobDTO;
+import cn.bishion.timer.task.AsyncTask;
+import cn.bishion.toolkit.common.dto.BizException;
+import cn.bishion.toolkit.common.util.BaseAssert;
+import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
+@Slf4j
 @Service
 public class QuartzService {
     @Resource
     private Scheduler scheduler;
-    public void addJob(CreateJobReq jobReq) throws SchedulerException {
-        JobDetail jobDetail = JobBuilder.newJob().
-                withIdentity("job2", "GUOFANGBI").ofType(QuartzTask.class).build();
-        jobDetail.getJobDataMap().put("hehe","heheda");
-        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "GUOFANGBI")
-                .withSchedule(CronScheduleBuilder.cronSchedule("* * * * * ?")).build();
 
-        scheduler.scheduleJob(jobDetail, trigger);
+    public void addTask(QuartzJobDTO quartzJob) {
+        try{
+            JobDetail jobDetail = JobBuilder.newJob().
+                    withIdentity(quartzJob.getJobName(), quartzJob.getGroup()).ofType(AsyncTask.class).build();
+
+            jobDetail.getJobDataMap().putAll(quartzJob.getParam());
+
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(quartzJob.getTriggerName(),quartzJob.getGroup())
+                    .withSchedule(CronScheduleBuilder.cronSchedule(quartzJob.getCron())).build();
+            scheduler.scheduleJob(jobDetail, trigger);
+
+        }catch (SchedulerException e){
+            log.warn("任务添加失败. jobId:{},appCode:{}",quartzJob.getJobName(),quartzJob.getGroup(),e);
+            throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "新增", quartzJob.getJobName());
+        }
 
     }
-    public void deleteJob(String jobId){
-        JobKey jobKey = JobKey.jobKey("job1","GUOFANGBI");
+
+    public void deleteTask(String jobName, String group){
         try {
-            scheduler.deleteJob(jobKey);
+            if(scheduler.getTriggerState(TriggerKey.triggerKey(jobName,group)) == Trigger.TriggerState.NONE){
+                return;
+            }
+            BaseAssert.isTrue(scheduler.deleteJob(JobKey.jobKey(jobName,group)),TimerError.QRTZ_OPT_FAIL, "删除", jobName);
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.warn("任务删除失败. jobId:{},appCode:{}",jobName,group,e);
+            throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "删除", jobName);
         }
     }
 
-    public void pauseJob(String jobId){
+    public void stopTask(String jobName, String group){
         try {
-            scheduler.pauseJob(JobKey.jobKey("job1","GUOFANGBI"));
+            if(scheduler.getTriggerState(TriggerKey.triggerKey(jobName,group)) == Trigger.TriggerState.PAUSED){
+                return;
+            }
+            scheduler.pauseJob(JobKey.jobKey(jobName, group));
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.warn("任务暂停失败. jobId:{},appCode:{}",jobName,group,e);
+            throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "新增", jobName);
         }
     }
-    public void resumeJob(String jobId){
+    public void restartTask(String jobName, String group, String cron){
         try {
-            scheduler.resumeJob(JobKey.jobKey("job1","GUOFANGBI"));
+            TriggerKey triggerKey = TriggerKey.triggerKey(jobName, group);
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobName, group)
+                    .withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+            scheduler.rescheduleJob(triggerKey,trigger);
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.warn("任务重启失败. jobId:{},appCode:{}",jobName,group,e);
+            throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "启动", jobName);
         }
     }
 }
