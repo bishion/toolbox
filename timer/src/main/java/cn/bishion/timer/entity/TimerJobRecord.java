@@ -7,23 +7,22 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
-@TableName("timer_job_config")
-public class TimerJobConfig {
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long   id;
+@TableName("timer_job_record")
+public class TimerJobRecord {
+    @TableId(value = "code", type = IdType.ASSIGN_ID)
     private String code;
-    private String appCode;
-    private String name;
-    private String cron;
-    private String note;
-    private String param;
-    private String warnMails;
-    private String url;
-    private String runStatus;
-    private String jobType;
+    private Long jobId;
+    private String execIp;
     private String beanName;
+    private String param;
+    private Date startTime;
+    private Date endTime;
+    private String status;
+    private String resultMsg;
 
     @Override
     public String toString() {

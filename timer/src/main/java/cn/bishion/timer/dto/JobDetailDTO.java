@@ -1,6 +1,6 @@
 package cn.bishion.timer.dto;
 
-import cn.bishion.timer.consts.TaskTypeEnum;
+import cn.bishion.timer.consts.JobTypeEnum;
 import cn.bishion.toolkit.common.consts.YesNoEnum;
 import cn.bishion.toolkit.common.util.ToString;
 import lombok.Getter;
@@ -29,7 +29,9 @@ public class JobDetailDTO {
     @NotNull(message="是否执行不能为空")
     private YesNoEnum runStatus;
     @NotNull(message="任务类型不能为空")
-    private TaskTypeEnum taskTypeEnum;
+    private JobTypeEnum jobTypeEnum;
+    @NotNull(message="任务执行器不能为空")
+    private JobTypeEnum beanName;
 
     @Override
     public String toString() {

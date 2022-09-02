@@ -2,16 +2,14 @@ package cn.bishion.timer.service;
 
 import cn.bishion.timer.consts.TimerError;
 import cn.bishion.timer.dto.QuartzJobDTO;
-import cn.bishion.timer.task.AsyncTask;
+import cn.bishion.timer.task.QuartzTask;
 import cn.bishion.toolkit.common.dto.BizException;
 import cn.bishion.toolkit.common.util.BaseAssert;
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -22,7 +20,7 @@ public class QuartzService {
     public void addTask(QuartzJobDTO quartzJob) {
         try{
             JobDetail jobDetail = JobBuilder.newJob().
-                    withIdentity(quartzJob.getJobName(), quartzJob.getGroup()).ofType(AsyncTask.class).build();
+                    withIdentity(quartzJob.getJobName(), quartzJob.getGroup()).ofType(QuartzTask.class).build();
 
             jobDetail.getJobDataMap().putAll(quartzJob.getParam());
 

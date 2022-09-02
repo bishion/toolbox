@@ -9,13 +9,11 @@ import cn.bishion.timer.mapper.TimerJobConfigMapper;
 import cn.bishion.timer.dto.JobDetailDTO;
 import cn.bishion.toolkit.common.consts.BaseConst;
 import cn.bishion.toolkit.common.consts.YesNoEnum;
-import cn.bishion.toolkit.common.dto.BizException;
 import cn.bishion.toolkit.common.util.BaseAssert;
 import cn.bishion.toolkit.common.util.IdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
-import jdk.nashorn.internal.scripts.JO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -153,14 +151,8 @@ public class TimerAdminService {
         QuartzJobDTO jobDTO = new QuartzJobDTO();
         jobDTO.setCron(jobDetailDTO.getCron());
         jobDTO.setGroup(jobDetailDTO.getAppCode());
-
-        Map<String, String> param = Maps.newHashMapWithExpectedSize(BaseConst.INT_2);
-        param.put(TimerConst.JOB_PARAM_URL, jobDetailDTO.getUrl());
-        param.put(TimerConst.JOB_PARAM_KEY, jobDetailDTO.getParam());
         jobDTO.setJobName(name);
         jobDTO.setTriggerName(name);
-        jobDTO.setParam(param);
-
         return jobDTO;
     }
 }
