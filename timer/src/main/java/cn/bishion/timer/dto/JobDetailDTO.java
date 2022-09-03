@@ -22,16 +22,16 @@ public class JobDetailDTO {
     private String param;
     private String note;
     private Long id;
-    @NotBlank(message="告警接收人不能为空")
-    private String warnMails;
+    @NotBlank(message="消息接收人不能为空")
+    private String tipsReceiver;
     @NotBlank(message="调度地址不能为空")
     private String url;
     @NotNull(message="是否执行不能为空")
     private YesNoEnum runStatus;
     @NotNull(message="任务类型不能为空")
-    private JobTypeEnum jobTypeEnum;
+    private JobTypeEnum jobType;
     @NotNull(message="任务执行器不能为空")
-    private JobTypeEnum beanName;
+    private String beanName;
 
     @Override
     public String toString() {

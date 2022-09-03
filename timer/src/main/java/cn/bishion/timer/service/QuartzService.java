@@ -22,8 +22,6 @@ public class QuartzService {
             JobDetail jobDetail = JobBuilder.newJob().
                     withIdentity(quartzJob.getJobName(), quartzJob.getGroup()).ofType(QuartzTask.class).build();
 
-            jobDetail.getJobDataMap().putAll(quartzJob.getParam());
-
             CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(quartzJob.getTriggerName(),quartzJob.getGroup())
                     .withSchedule(CronScheduleBuilder.cronSchedule(quartzJob.getCron())).build();
             scheduler.scheduleJob(jobDetail, trigger);

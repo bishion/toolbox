@@ -13,7 +13,6 @@ public class QuartzJobDTO {
     private String jobName;
     private String group;
     private String triggerName;
-    private Map<String,String> param;
 
     @Override
     public String toString() {

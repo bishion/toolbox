@@ -5,14 +5,14 @@ spring:
     password: root1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maxPoolSize: 3
-      minIdle: 1
       auto-commit: true
       connection-test-query: SELECT 1
       pool-name: DatebookHikariCP
       connection-timeout: 30000
       idle-timeout: 30000
       max-lifetime: 1800000
+      maximum-pool-size: 3
+      minimum-idle: 1
   quartz:
     job-store-type: jdbc
     properties:
@@ -23,11 +23,11 @@ spring:
     wait-for-jobs-to-complete-on-shutdown: true
     overwrite-existing-jobs: false
 
-logging:
-  level:
-    org.quartz: debug
+#logging:
+#  level:
+#    org.quartz: debug
 server:
   port: 8080
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

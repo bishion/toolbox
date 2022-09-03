@@ -17,7 +17,9 @@ public class TimerConfiguration {
     @Bean
     public RestTemplate taskRestTemplate(){
         ConnectionPool connectionPool = new ConnectionPool(BaseConst.INT_50, BaseConst.INT_5, TimeUnit.MINUTES);
-        OkHttpClient httpClient = new OkHttpClient.Builder().retryOnConnectionFailure(false).connectionPool(connectionPool).build();
+        OkHttpClient httpClient = new OkHttpClient.Builder().retryOnConnectionFailure(false)
+                .connectTimeout(BaseConst.INT_50,TimeUnit.SECONDS).readTimeout(BaseConst.INT_50,TimeUnit.SECONDS)
+                .connectionPool(connectionPool).build();
         ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory(httpClient);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(factory);

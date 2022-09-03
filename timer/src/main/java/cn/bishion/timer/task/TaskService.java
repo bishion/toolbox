@@ -7,6 +7,7 @@ import cn.bishion.timer.entity.TimerJobConfig;
 import cn.bishion.timer.entity.TimerJobRecord;
 import cn.bishion.timer.mapper.TimerJobConfigMapper;
 import cn.bishion.timer.mapper.TimerJobRecordMapper;
+import cn.bishion.timer.share.dto.TaskResultDTO;
 import cn.bishion.toolkit.common.consts.BaseConst;
 import cn.bishion.toolkit.common.util.IdUtil;
 import cn.hutool.json.JSONUtil;
@@ -43,6 +44,9 @@ public class TaskService {
     @Resource
     private ExecutorService saveRecordExecutor;
 
+    @Resource
+    private TipsMsgService tipsMsgService;
+
     public void executeByJobId(String jobId) {
         TimerJobConfig jobConfig = timerJobConfigMapper.selectById(jobId);
         if (Objects.isNull(jobConfig)) {
@@ -51,40 +55,45 @@ public class TaskService {
         }
 
         if (jobIsRunning(jobId)) {
+            log.warn("job is running.id:{},name:{}",jobId,jobConfig.getName());
             return;
         }
+        log.info("任务执行开始:{},{},{}",jobConfig.getId(),jobConfig.getName(),jobConfig.getAppCode());
         String recordCode = IdUtil.nextStr();
         TimerJobRecord jobRecord = initJobRecord(jobConfig, recordCode);
 
         HttpEntity<String> request = buildRequest(jobConfig, recordCode);
         try {
-            Map<String, String> map = taskRestTemplate.postForObject(jobConfig.getUrl(), request, Map.class);
-            assembleTaskResult(jobRecord, map);
+            TaskResultDTO resultDTO = taskRestTemplate.postForObject(jobConfig.getUrl(), request, TaskResultDTO.class);
+            assembleTaskResult(jobRecord, resultDTO);
         } catch (Exception e) {
             jobRecord.setStatus(RecordStatusEnum.ERROR.name());
             jobRecord.setResultMsg(e.getMessage());
             log.error("任务执行失败. jobInfo:{}", jobConfig, e);
         } finally {
             jobRecord.setEndTime(new Date());
-            saveRecordExecutor.execute(() -> timerJobRecordMapper.updateById(jobRecord));
+            saveRecordExecutor.execute(() -> {
+                timerJobRecordMapper.updateById(jobRecord);
+                tipsMsgService.sendTipMessage(jobConfig,jobRecord);
+            });
         }
+        log.info("任务执行结束:{},{},{}",jobConfig.getId(),jobConfig.getName(),jobConfig.getAppCode());
     }
 
     private boolean jobIsRunning(String jobId) {
         LambdaQueryWrapper<TimerJobRecord> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TimerJobRecord::getJobId, jobId);
         queryWrapper.eq(TimerJobRecord::getStatus, RecordStatusEnum.ING.name());
-        if (timerJobRecordMapper.selectCount(queryWrapper) > 0) {
-            log.info("任务执行中.id:{}", jobId);
-            return true;
-        }
-        return false;
+        return timerJobRecordMapper.selectCount(queryWrapper) > 0;
     }
 
-    private void assembleTaskResult(TimerJobRecord jobRecord, Map<String, String> result) {
-        jobRecord.setStatus(result.get(TimerConst.RTN_PARAM_STATUS));
-        jobRecord.setExecIp(result.get(TimerConst.RTN_PARAM_HOST));
-        jobRecord.setResultMsg(result.get(TimerConst.RTN_PARAM_MSG));
+    private void assembleTaskResult(TimerJobRecord jobRecord, TaskResultDTO taskResultDTO) {
+        if (Objects.isNull(taskResultDTO)){
+            taskResultDTO = TaskResultDTO.failure("远程请求返回值为空.");
+        }
+        jobRecord.setStatus(taskResultDTO.getStatus());
+        jobRecord.setExecIp(taskResultDTO.getHost());
+        jobRecord.setResultMsg(taskResultDTO.getMsg());
     }
 
 

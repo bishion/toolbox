@@ -2,7 +2,6 @@ package cn.bishion.timer.task;
 
 import cn.bishion.toolkit.common.util.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;

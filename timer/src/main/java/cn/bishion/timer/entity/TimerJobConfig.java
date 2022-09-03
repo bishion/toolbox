@@ -19,7 +19,7 @@ public class TimerJobConfig {
     private String cron;
     private String note;
     private String param;
-    private String warnMails;
+    private String tipsReceiver;
     private String url;
     private String runStatus;
     private String jobType;

@@ -2,6 +2,7 @@ package cn.bishion.timer.service;
 
 import cn.bishion.timer.entity.TimerJobRecord;
 import cn.bishion.timer.mapper.TimerJobRecordMapper;
+import cn.bishion.timer.task.TipsMsgService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -12,6 +13,8 @@ public class TaskCallbackService {
     @Resource
     private TimerJobRecordMapper timerJobRecordMapper;
 
+    @Resource
+    private TipsMsgService tipsMsgService;
     public void callBack(String code, String status, String msg, String execIp) {
         TimerJobRecord jobRecord = new TimerJobRecord();
 
@@ -22,5 +25,6 @@ public class TaskCallbackService {
         jobRecord.setEndTime(new Date());
 
         timerJobRecordMapper.updateById(jobRecord);
+        tipsMsgService.sendTipMessage(jobRecord);
     }
 }
