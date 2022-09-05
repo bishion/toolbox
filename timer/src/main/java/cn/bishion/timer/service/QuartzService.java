@@ -2,14 +2,18 @@ package cn.bishion.timer.service;
 
 import cn.bishion.timer.consts.TimerError;
 import cn.bishion.timer.dto.QuartzJobDTO;
+import cn.bishion.timer.dto.RunningJobDTO;
 import cn.bishion.timer.task.QuartzTask;
 import cn.bishion.toolkit.common.dto.BizException;
 import cn.bishion.toolkit.common.util.BaseAssert;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -18,53 +22,65 @@ public class QuartzService {
     private Scheduler scheduler;
 
     public void addTask(QuartzJobDTO quartzJob) {
-        try{
+        try {
             JobDetail jobDetail = JobBuilder.newJob().
                     withIdentity(quartzJob.getJobName(), quartzJob.getGroup()).ofType(QuartzTask.class).build();
 
-            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(quartzJob.getTriggerName(),quartzJob.getGroup())
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(quartzJob.getTriggerName(), quartzJob.getGroup())
                     .withSchedule(CronScheduleBuilder.cronSchedule(quartzJob.getCron())).build();
             scheduler.scheduleJob(jobDetail, trigger);
 
-        }catch (SchedulerException e){
-            log.warn("任务添加失败. jobId:{},appCode:{}",quartzJob.getJobName(),quartzJob.getGroup(),e);
+        } catch (SchedulerException e) {
+            log.warn("任务添加失败. jobId:{},appCode:{}", quartzJob.getJobName(), quartzJob.getGroup(), e);
             throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "新增", quartzJob.getJobName());
         }
 
     }
 
-    public void deleteTask(String jobName, String group){
+    public void deleteTask(String jobName, String group) {
         try {
-            if(scheduler.getTriggerState(TriggerKey.triggerKey(jobName,group)) == Trigger.TriggerState.NONE){
+            if (scheduler.getTriggerState(TriggerKey.triggerKey(jobName, group)) == Trigger.TriggerState.NONE) {
                 return;
             }
-            BaseAssert.isTrue(scheduler.deleteJob(JobKey.jobKey(jobName,group)),TimerError.QRTZ_OPT_FAIL, "删除", jobName);
+            BaseAssert.isTrue(scheduler.deleteJob(JobKey.jobKey(jobName, group)), TimerError.QRTZ_OPT_FAIL, "删除", jobName);
         } catch (SchedulerException e) {
-            log.warn("任务删除失败. jobId:{},appCode:{}",jobName,group,e);
+            log.warn("任务删除失败. jobId:{},appCode:{}", jobName, group, e);
             throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "删除", jobName);
         }
     }
 
-    public void stopTask(String jobName, String group){
+    public void stopTask(String jobName, String group) {
         try {
-            if(scheduler.getTriggerState(TriggerKey.triggerKey(jobName,group)) == Trigger.TriggerState.PAUSED){
+            if (scheduler.getTriggerState(TriggerKey.triggerKey(jobName, group)) == Trigger.TriggerState.PAUSED) {
                 return;
             }
             scheduler.pauseJob(JobKey.jobKey(jobName, group));
         } catch (SchedulerException e) {
-            log.warn("任务暂停失败. jobId:{},appCode:{}",jobName,group,e);
+            log.warn("任务暂停失败. jobId:{},appCode:{}", jobName, group, e);
             throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "新增", jobName);
         }
     }
-    public void restartTask(String jobName, String group, String cron){
+
+    public void restartTask(String jobName, String group, String cron) {
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName, group);
             CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobName, group)
                     .withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
-            scheduler.rescheduleJob(triggerKey,trigger);
+            scheduler.rescheduleJob(triggerKey, trigger);
         } catch (SchedulerException e) {
-            log.warn("任务重启失败. jobId:{},appCode:{}",jobName,group,e);
+            log.warn("任务重启失败. jobId:{},appCode:{}", jobName, group, e);
             throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "启动", jobName);
+        }
+    }
+
+
+    public List<RunningJobDTO> queryRunningTask() {
+        try {
+            return scheduler.getJobKeys(GroupMatcher.anyGroup())
+                    .parallelStream().map(item -> new RunningJobDTO(item.getName(), item.getGroup()))
+                    .collect(Collectors.toList());
+        } catch (SchedulerException e) {
+            throw BizException.throwExp(TimerError.QRTZ_OPT_FAIL, "启动", e.getMessage());
         }
     }
 }

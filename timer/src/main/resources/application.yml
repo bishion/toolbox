@@ -23,9 +23,9 @@ spring:
     wait-for-jobs-to-complete-on-shutdown: true
     overwrite-existing-jobs: false
 
-#logging:
-#  level:
-#    org.quartz: debug
+logging:
+  level:
+    root: debug
 server:
   port: 8080
 #mybatis-plus:

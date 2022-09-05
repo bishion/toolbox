@@ -1,15 +1,20 @@
 package cn.bishion.timer.consts;
 
 public enum RecordStatusEnum {
-    ING("执行中"),
-    SUCCESS("执行成功"),
-    FAILURE("执行失败"),
-    ERROR("执行出错"),
+    ING("执行中。。。"),
+    SUCCESS("执行成功。"),
+    FAILURE("执行失败："),
+    ERROR("调度异常："),
+    CLOSE("手动关闭："),
     ;
 
-    private String desc;
+    private final String desc;
 
     RecordStatusEnum(String desc) {
         this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

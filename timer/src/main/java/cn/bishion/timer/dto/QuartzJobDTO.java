@@ -4,11 +4,11 @@ import cn.bishion.toolkit.common.util.ToString;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
+import java.io.Serializable;
 
 @Getter
 @Setter
-public class QuartzJobDTO {
+public class QuartzJobDTO implements Serializable {
     private String cron;
     private String jobName;
     private String group;

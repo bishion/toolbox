@@ -1,25 +1,27 @@
 package cn.bishion.timer.service;
 
-import cn.bishion.timer.consts.TimerConst;
 import cn.bishion.timer.consts.TimerError;
+import cn.bishion.timer.dto.JobDetailDTO;
 import cn.bishion.timer.dto.QuartzJobDTO;
+import cn.bishion.timer.dto.RunningJobDTO;
 import cn.bishion.timer.entity.TimerJobConfig;
 import cn.bishion.timer.mapper.QrtzCronTriggersMapperExt;
 import cn.bishion.timer.mapper.TimerJobConfigMapper;
-import cn.bishion.timer.dto.JobDetailDTO;
 import cn.bishion.toolkit.common.consts.BaseConst;
 import cn.bishion.toolkit.common.consts.YesNoEnum;
 import cn.bishion.toolkit.common.util.BaseAssert;
 import cn.bishion.toolkit.common.util.IdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Maps;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -132,7 +134,7 @@ public class TimerAdminService {
         });
     }
 
-    public void deleteTask(String jobId, String appCode){
+    public void deleteTask(String jobId, String appCode) {
 
         transactionTemplate.execute(status -> {
             try {
@@ -146,6 +148,7 @@ public class TimerAdminService {
             return null;
         });
     }
+
     private static QuartzJobDTO convert2JobDTO(JobDetailDTO jobDetailDTO, Long id) {
         String name = id.toString();
         QuartzJobDTO jobDTO = new QuartzJobDTO();
@@ -155,4 +158,48 @@ public class TimerAdminService {
         jobDTO.setTriggerName(name);
         return jobDTO;
     }
+
+    public List<RunningJobDTO> queryAllRunningTask() {
+        List<RunningJobDTO> memJobList = quartzService.queryRunningTask();
+        LambdaQueryWrapper<TimerJobConfig> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TimerJobConfig::getRunStatus, YesNoEnum.YES.name());
+        wrapper.select(TimerJobConfig::getId, TimerJobConfig::getName, TimerJobConfig::getAppCode);
+        List<RunningJobDTO> dbJobList = timerJobConfigMapper.selectList(wrapper).parallelStream()
+                .map(item -> new RunningJobDTO(item.getId(), item.getName(), item.getAppCode()))
+                .collect(Collectors.toList());
+
+        if (memJobList.size() == BaseConst.INT_0) {
+            return dbJobList;
+        }
+        if (dbJobList.size() == BaseConst.INT_0) {
+            return memJobList;
+        }
+
+        return merge(memJobList, dbJobList);
+    }
+
+    private List<RunningJobDTO> merge(List<RunningJobDTO> memJobList, List<RunningJobDTO> dbJobList) {
+        List<RunningJobDTO> runningJobList = new LinkedList<>();
+        int i = 0, j = 0;
+        for (; i < memJobList.size(); i++) {
+            RunningJobDTO memJob = memJobList.get(i);
+            runningJobList.add(memJob);
+            for (; j < dbJobList.size(); j++) {
+                RunningJobDTO dbJob = dbJobList.get(j);
+                if (memJob.getId().equals(dbJob.getId())) {
+                    memJob.setName(dbJob.getName());
+                    memJob.setDbStatus(YesNoEnum.YES.name());
+                    j++;
+                    break;
+                } else if (memJob.getId() < dbJob.getId()) {
+                    runningJobList.add(dbJob);
+                } else {
+                    j++;
+                    break;
+                }
+            }
+        }
+        return runningJobList;
+    }
+
 }

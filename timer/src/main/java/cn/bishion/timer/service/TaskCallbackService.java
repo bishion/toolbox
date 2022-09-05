@@ -15,13 +15,14 @@ public class TaskCallbackService {
 
     @Resource
     private TipsMsgService tipsMsgService;
-    public void callBack(String code, String status, String msg, String execIp) {
+
+    public void callBack(Long recordId, String status, String msg, String execHost) {
         TimerJobRecord jobRecord = new TimerJobRecord();
 
-        jobRecord.setCode(code);
+        jobRecord.setId(recordId);
         jobRecord.setStatus(status);
         jobRecord.setResultMsg(msg);
-        jobRecord.setExecIp(execIp);
+        jobRecord.setExecHost(execHost);
         jobRecord.setEndTime(new Date());
 
         timerJobRecordMapper.updateById(jobRecord);

@@ -2,23 +2,20 @@ package cn.bishion.timer.web;
 
 import cn.bishion.timer.consts.TimerError;
 import cn.bishion.timer.dto.JobDetailDTO;
+import cn.bishion.timer.dto.RunningJobDTO;
 import cn.bishion.timer.service.TimerAdminService;
-import cn.bishion.timer.service.QuartzService;
 import cn.bishion.toolkit.common.dto.BaseResult;
 import cn.bishion.toolkit.common.util.BaseAssert;
 import org.quartz.CronExpression;
-import org.quartz.SchedulerException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/task")
 public class TimerAdminController {
-
-    @Resource
-    private QuartzService quartzService;
 
     @Resource
     private TimerAdminService timerAdminService;
@@ -47,13 +44,18 @@ public class TimerAdminController {
 
     @PostMapping("/restart/{appCode}/{id}")
     public BaseResult<Void> restartJob(@PathVariable("appCode") String appCode, @PathVariable("id") String id) {
-        timerAdminService.restartTask(id,appCode);
+        timerAdminService.restartTask(id, appCode);
         return BaseResult.success();
     }
 
     @PostMapping("/delete/{appCode}/{id}")
     public BaseResult<Void> deleteJob(@PathVariable("appCode") String appCode, @PathVariable("id") String id) {
-        timerAdminService.deleteTask(id,appCode);
+        timerAdminService.deleteTask(id, appCode);
         return BaseResult.success();
+    }
+
+    @GetMapping("/task/running")
+    public BaseResult<List<RunningJobDTO>> queryRunningTask() {
+        return BaseResult.success(timerAdminService.queryAllRunningTask());
     }
 }

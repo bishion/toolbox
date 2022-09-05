@@ -9,7 +9,6 @@ import cn.bishion.timer.mapper.TimerJobConfigMapper;
 import cn.bishion.timer.mapper.TimerJobRecordMapper;
 import cn.bishion.timer.share.dto.TaskResultDTO;
 import cn.bishion.toolkit.common.consts.BaseConst;
-import cn.bishion.toolkit.common.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Maps;
@@ -55,29 +54,30 @@ public class TaskService {
         }
 
         if (jobIsRunning(jobId)) {
-            log.warn("job is running.id:{},name:{}",jobId,jobConfig.getName());
+            log.warn("job is running.id:{},name:{}", jobId, jobConfig.getName());
             return;
         }
-        log.info("任务执行开始:{},{},{}",jobConfig.getId(),jobConfig.getName(),jobConfig.getAppCode());
-        String recordCode = IdUtil.nextStr();
-        TimerJobRecord jobRecord = initJobRecord(jobConfig, recordCode);
+        log.info("任务执行开始:{},{},{}", jobConfig.getId(), jobConfig.getName(), jobConfig.getAppCode());
+        TimerJobRecord jobRecord = initJobRecord(jobConfig);
 
-        HttpEntity<String> request = buildRequest(jobConfig, recordCode);
+        HttpEntity<String> request = buildRequest(jobConfig, jobRecord.getJobId());
         try {
             TaskResultDTO resultDTO = taskRestTemplate.postForObject(jobConfig.getUrl(), request, TaskResultDTO.class);
+
+
             assembleTaskResult(jobRecord, resultDTO);
         } catch (Exception e) {
             jobRecord.setStatus(RecordStatusEnum.ERROR.name());
-            jobRecord.setResultMsg(e.getMessage());
-            log.error("任务执行失败. jobInfo:{}", jobConfig, e);
+            jobRecord.setResultMsg(RecordStatusEnum.ERROR.getDesc() + e.getMessage());
+            log.error("任务调度异常. jobInfo:{}", jobConfig, e);
         } finally {
             jobRecord.setEndTime(new Date());
             saveRecordExecutor.execute(() -> {
                 timerJobRecordMapper.updateById(jobRecord);
-                tipsMsgService.sendTipMessage(jobConfig,jobRecord);
+                tipsMsgService.sendTipMessage(jobConfig, jobRecord);
             });
         }
-        log.info("任务执行结束:{},{},{}",jobConfig.getId(),jobConfig.getName(),jobConfig.getAppCode());
+        log.info("任务执行结束:{},{},{}", jobConfig.getId(), jobConfig.getName(), jobConfig.getAppCode());
     }
 
     private boolean jobIsRunning(String jobId) {
@@ -88,18 +88,17 @@ public class TaskService {
     }
 
     private void assembleTaskResult(TimerJobRecord jobRecord, TaskResultDTO taskResultDTO) {
-        if (Objects.isNull(taskResultDTO)){
+        if (Objects.isNull(taskResultDTO)) {
             taskResultDTO = TaskResultDTO.failure("远程请求返回值为空.");
         }
         jobRecord.setStatus(taskResultDTO.getStatus());
-        jobRecord.setExecIp(taskResultDTO.getHost());
+        jobRecord.setExecHost(taskResultDTO.getHost());
         jobRecord.setResultMsg(taskResultDTO.getMsg());
     }
 
 
-    private TimerJobRecord initJobRecord(TimerJobConfig jobConfig, String recordCode) {
+    private TimerJobRecord initJobRecord(TimerJobConfig jobConfig) {
         TimerJobRecord jobRecord = new TimerJobRecord();
-        jobRecord.setCode(recordCode);
         jobRecord.setStartTime(new Date());
         jobRecord.setBeanName(jobConfig.getBeanName());
         jobRecord.setParam(jobConfig.getParam());
@@ -107,17 +106,17 @@ public class TaskService {
         jobRecord.setStatus(RecordStatusEnum.ING.name());
         timerJobRecordMapper.insert(jobRecord);
         TimerJobRecord newRecord = new TimerJobRecord();
-        newRecord.setCode(recordCode);
+        newRecord.setId(jobRecord.getId());
 
         return newRecord;
     }
 
-    private HttpEntity<String> buildRequest(TimerJobConfig jobConfig, String recordCode) {
+    private HttpEntity<String> buildRequest(TimerJobConfig jobConfig, Long recordId) {
         Map<String, String> param = Maps.newHashMapWithExpectedSize(BaseConst.INT_2);
         param.put(TimerConst.REQ_PARAM_BEAN, jobConfig.getBeanName());
         param.put(TimerConst.REQ_PARAM_KEY, jobConfig.getParam());
         if (JobTypeEnum.ASYNC.name().equals(jobConfig.getJobType())) {
-            param.put(TimerConst.REQ_PARAM_CALLBACK, callbackUrl + recordCode);
+            param.put(TimerConst.REQ_PARAM_CALLBACK, callbackUrl + recordId);
         }
         param.put(TimerConst.REQ_PARAM_KEY, jobConfig.getParam());
         HttpHeaders httpHeaders = new HttpHeaders();

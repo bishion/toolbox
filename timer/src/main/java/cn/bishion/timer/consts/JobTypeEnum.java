@@ -1,14 +1,16 @@
 package cn.bishion.timer.consts;
 
-import cn.bishion.timer.task.QuartzTask;
-import cn.bishion.timer.task.TaskService;
-
+/**
+ * 任务类型，是同步等待返回结果还是异步等待回调
+ */
 public enum JobTypeEnum {
-    SYNC("同步执行"),
-    ASYNC("异步执行");
-    private String desc;
+    /**
+     * 同步执行
+     */
+    SYNC,
+    /**
+     * 同步执行
+     */
+    ASYNC
 
-    JobTypeEnum(String desc){
-        this.desc = desc;
-    }
 }

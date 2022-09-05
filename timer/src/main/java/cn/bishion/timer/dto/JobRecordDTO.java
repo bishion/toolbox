@@ -1,25 +1,22 @@
-package cn.bishion.timer.entity;
+package cn.bishion.timer.dto;
 
 import cn.bishion.toolkit.common.util.ToString;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
-@TableName("timer_job_record")
-public class TimerJobRecord {
-    @TableId(value = "id", type = IdType.AUTO)
+public class JobRecordDTO implements Serializable {
     private Long id;
     private Long jobId;
     private String execHost;
-    private String beanName;
-    private String param;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
     private String status;
     private String resultMsg;
